@@ -13,7 +13,14 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     fps = pygame.time.Clock()
     dt = 0
-    player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
+    
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+
+    Player.containers(updatable, drawable)
+
+    # Player activity
+    Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
 
     # Allow for the closing of a window
     while True:
@@ -24,22 +31,17 @@ def main():
         # Set the screen fill color to black and force it to refresh    
         screen.fill(color="black")
 
-        # Sets the delta time to a value of 60 (60k ms) and converts it to seconds.
-        # Essentially this is the FPS (frames per second)
+        # Limit FPS to 60
         dt = fps.tick(60) / 1000
 
         # Update players current position on screen
-        player.update(dt)
+        updatable.update(dt)
 
         # Renders the player onto screen to match each frame
-        player.draw(screen)
+        drawable.draw(screen)
         
         # Re-renders all objects on the screen (i.e..players, asteroids etc...)
         pygame.display.flip()
-
-
-
-
 
 if __name__ == "__main__":
     main()
