@@ -4,6 +4,9 @@
 import pygame
 from constants import *
 from player import Player
+from shot import Shot
+from asteroid import Asteroid
+from asteroidfield import AsteroidField
 
 
 def main():
@@ -14,13 +17,21 @@ def main():
     fps = pygame.time.Clock()
     dt = 0
     
+    # Unique groups for game objects
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
 
-    Player.containers(updatable, drawable)
+    # Adding game objects to groups
+    Player.containers = (updatable, drawable)
+    Asteroid.containers = (asteroids, updatable, drawable)
+    AsteroidField.containers = (updatable)
+    Shot.containers = (updatable, drawable, shots)
 
-    # Player activity
-    Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
+    # Object creation
+    player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
+    asteroidfield = AsteroidField()
 
     # Allow for the closing of a window
     while True:
@@ -31,17 +42,25 @@ def main():
         # Set the screen fill color to black and force it to refresh    
         screen.fill(color="black")
 
-        # Limit FPS to 60
-        dt = fps.tick(60) / 1000
-
         # Update players current position on screen
-        updatable.update(dt)
+        for obj in updatable:
+            obj.update(dt)
 
         # Renders the player onto screen to match each frame
-        drawable.draw(screen)
-        
+        for obj in drawable:
+            obj.draw(screen)
+
+        # Check for collisions
+        for obj in asteroids:
+            if obj.collision(player):
+                print("Game Over!")
+                exit()
+                
         # Re-renders all objects on the screen (i.e..players, asteroids etc...)
         pygame.display.flip()
+
+        # Limit FPS to 60
+        dt = fps.tick(60) / 1000
 
 if __name__ == "__main__":
     main()
