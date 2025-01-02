@@ -6,7 +6,7 @@ class MusicManager:
 
         # Dictionaries for BGM and SFX
         self.music = {
-            "game_start_bgm": "assets/audio/game_start.mp3",
+            "game_start_bgm": "assets/audio/game_start.ogg",
             "game_over_bgm": "assets/audio/game_over.mp3",
         }
         self.sounds = {
