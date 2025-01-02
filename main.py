@@ -3,6 +3,7 @@
 # throughout this file
 import pygame
 from constants import *
+from music import MusicManager
 from player import Player
 from shot import Shot
 from asteroid import Asteroid
@@ -15,6 +16,7 @@ def main():
     print(f'Screen height: {SCREEN_HEIGHT}')
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     fps = pygame.time.Clock()
+    audio = MusicManager()
     dt = 0
     
     # Unique groups for game objects
@@ -33,6 +35,9 @@ def main():
     player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
     asteroidfield = AsteroidField()
 
+    # Start game BGM
+    audio.play_bgm("game_start_bgm", loop=True)
+
     # Allow for the closing of a window
     while True:
         for event in pygame.event.get():
@@ -50,11 +55,25 @@ def main():
         for obj in drawable:
             obj.draw(screen)
 
-        # Check for collisions
+        # Checks for collisions between ship shots and asteroids
+        for asteroid in asteroids:
+            for shot in shots:
+                if shot.collision(asteroid):
+                    asteroid.split()
+                    #pygame.sprite.Sprite.kill(asteroid)
+                    pygame.sprite.Sprite.kill(shot)
+
+        # Check for collisions and end game if occurs
         for obj in asteroids:
             if obj.collision(player):
                 print("Game Over!")
-                exit()
+                audio.play_bgm("game_over_bgm")
+
+                # Wait until the game over music finishes before exiting
+                while pygame.mixer.music.get_busy():
+                    pygame.time.Clock().tick(10) # Check every 10ms
+
+                exit()   # Exit the game after the music finishes
                 
         # Re-renders all objects on the screen (i.e..players, asteroids etc...)
         pygame.display.flip()
